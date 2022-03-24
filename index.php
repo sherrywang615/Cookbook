@@ -69,7 +69,7 @@
 
     <hr />
 
-    <h2>Looking For A Quick Recipe? Filter Recipes By Preparation Time! </h2>
+    <h2>Looking For A Quick Recipe? Filter Recipes By Preparation Time!(select) </h2>
     <form method="GET" action="index.php">
         <!--refresh page when submitted-->
         <input type="hidden" id="filterRecipePreparationTimeRequest" name="filterRecipePreparationTimeRequest">
@@ -80,18 +80,52 @@
 
     <hr />
 
-    <h2>View Your Recipe Details</h2>
+    <h2>Projection</h2>
     <form method="GET" action="index.php">
         <!--refresh page when submitted-->
-        <input type="hidden" id="viewAllRecipesRequest" name="viewAllRecipesRequest">
-        <label for="recipeDetails"> Select Recipe Details:</label>
-        <select name="recipeDetails" id="recipeDetails">
-            <option value="Title">Title</option>
-            <option value="Title">Preparation Time</option>
-            <option value="Title">Difficulty</option>
-        </select><br /><br />
 
         <input type="submit" value="View" name="viewRecipeSubmit"></p>
+    </form>
+
+    <hr />
+
+    <h2>List All Ingredients Needed For Your Recipe (join recipeID_Name, requires, ingredient)</h2>
+    <form method="GET" action="index.php">
+        <!--refresh page when submitted-->
+        <input type="hidden" id="listIngredientsRequest" name="listIngredientsRequest">
+        Recipe Title: <input type="text" name="recipeTitle"><br /><br />
+
+        <input type="submit" value="List Ingredients" name="listIngredientsSubmit"></p>
+    </form>
+
+    <hr />
+
+    <h2>Find the Recipes with the Highest Difficulty (Aggregation)</h2>
+    <form method="GET" action="index.php">
+        <!--refresh page when submitted-->
+        <input type="hidden" id="findMaxDifficultyRequest" name="findMaxDifficultyRequest">
+
+        <input type="submit" value="Search" name="findMaxDifficultySubmit"></p>
+    </form>
+
+    <hr />
+
+    <h2>Find the Recipes with the Lowest Difficulty (Aggregation)</h2>
+    <form method="GET" action="index.php">
+        <!--refresh page when submitted-->
+        <input type="hidden" id="findMinDifficultyRequest" name="findMinDifficultyRequest">
+
+        <input type="submit" value="Search" name="findMinDifficultySubmit"></p>
+    </form>
+
+    <hr />
+
+    <h2>Count the Number of Ingredients Used For Each Recipe (Nested aggregation)</h2>
+    <form method="GET" action="index.php">
+        <!--refresh page when submitted-->
+        <input type="hidden" id="findMinDifficultyRequest" name="findMinDifficultyRequest">
+
+        <input type="submit" value="Search" name="findMinDifficultySubmit"></p>
     </form>
 
     <hr />
