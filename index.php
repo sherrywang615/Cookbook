@@ -49,9 +49,9 @@
     <form method="POST" action="index.php">
         <!--refresh page when submitted-->
         <input type="hidden" id="addRecipeRequest" name="addRecipeRequest">
-        RecipeName: <input type="text" name="recipeName"> <br /><br />
-        PreparationTime &#40In minutes&#41: <input type="text" name="preparationTime">&nbsp mins <br /><br />
-        Difficulty &#40Rate on a scale of 1-10&#41: <input type="text" name="difficulty"> <br /><br />
+        Recipe Title: <input type="text" name="newRecipeTitle"> <br /><br />
+        Preparation Time &#40In minutes&#41: <input type="text" name="newPreparationTime">&nbsp mins <br /><br />
+        Difficulty &#40Rate on a scale of 1-10&#41: <input type="text" name="newDifficulty"> <br /><br />
 
         <input type="submit" value="Add Recipe" name="addRecipeSubmit"></p>
     </form>
@@ -62,7 +62,7 @@
     <form method="GET" action="index.php">
         <!--refresh page when submitted-->
         <input type="hidden" id="deleteRecipeRequest" name="deleteRecipeRequest">
-        RecipeID: <input type="text" name="recipeName"> <br /><br />
+        Recipe Title: <input type="text" name="deleteRecipeTitle"> <br /><br />
 
         <input type="submit" value="Delete Recipe" name="deleteRecipeSubmit"></p>
     </form>
@@ -80,11 +80,18 @@
 
     <hr />
 
-    <h2>Projection</h2>
+    <h2>View Titles, Preparation Time, or Difficulty for All Recipes (Projection)</h2>
     <form method="GET" action="index.php">
         <!--refresh page when submitted-->
+        <input type="hidden" id="viewDetailsRequest" name="viewDetailsRequest
+        <label for=" recipeDetails"> Select Recipe Details:</label>
+        <select name="recipeDetails" id="recipeDetails">
+            <option value="Title">Title</option>
+            <option value="PrepTime">Preparation Time</option>
+            <option value="Difficulty">Difficulty</option>
+        </select><br /><br />
 
-        <input type="submit" value="View" name="viewRecipeSubmit"></p>
+        <input type="submit" value="View" name="viewDetailsSubmit"></p>
     </form>
 
     <hr />
@@ -123,9 +130,19 @@
     <h2>Count the Number of Ingredients Used For Each Recipe (Nested aggregation)</h2>
     <form method="GET" action="index.php">
         <!--refresh page when submitted-->
-        <input type="hidden" id="findMinDifficultyRequest" name="findMinDifficultyRequest">
+        <input type="hidden" id="countIngredientsRequest" name="countIngredientsRequest">
 
-        <input type="submit" value="Search" name="findMinDifficultySubmit"></p>
+        <input type="submit" value="View" name="countIngredientsRequest"></p>
+    </form>
+
+    <hr />
+
+    <h2>(Division)</h2>
+    <form method="GET" action="index.php">
+        <!--refresh page when submitted-->
+        <input type="hidden" id="countIngredientsRequest" name="countIngredientsRequest">
+
+        <input type="submit" value="View" name="countIngredientsRequest"></p>
     </form>
 
     <hr />
@@ -256,15 +273,24 @@
         OCILogoff($db_conn);
     }
 
-    function handleUpdateRequest()
+    function handleUpdateAccountRequest()
     {
         global $db_conn;
 
-        $old_name = $_POST['oldUsername'];
-        $new_name = $_POST['newUsername'];
+        $old_username = $_POST['oldUsername'];
+        $new_username = $_POST['newUsername'];
+        $old_password = $_POST['oldPassword'];
+        $new_password = $_POST['newPassword'];
 
         // you need the wrap the old name and new name values with single quotations
-        executePlainSQL("UPDATE User SET name='" . $new_name . "' WHERE name='" . $old_name . "'");
+        $result = executePlainSQL("UPDATE User SET username='$new_username', userPassword='$new_password' WHERE username='$old_username' AND userPassword='$old_password");
+
+        if ($result == true) {
+            echo "Success!";
+        } else {
+            echo "Error Updating Account";
+        }
+
         OCICommit($db_conn);
     }
 
@@ -280,21 +306,80 @@
         OCICommit($db_conn);
     }
 
-    function handleInsertRequest()
+    function handleCreateAccountRequest()
     {
         global $db_conn;
 
+        //Check if the username already exists
+        $nameEntered = $_POST['username'];
+        $result = executePlainSQL("SELECT Count(*) FROM User WHERE username = $nameEntered");
+        if (oci_fetch_row($result) != false) {
+            echo "Username already exists";
+        } else {
+            $tuple = array(
+                ":bind1" => $_POST['username'],
+                ":bind2" => $_POST['userPassword']
+            );
+
+            $userID = uniqid("user_");
+
+            $alltuples = array(
+                $tuple
+            );
+
+            $result = executeBoundSQL("Insert into User values ('$userID', :bind1, :bind2)", $alltuples);
+
+            if ($result == true) {
+                echo "Success!";
+            } else {
+                echo "Error Creating Account";
+            }
+        }
+
+        OCICommit($db_conn);
+    }
+
+    function handleAddRecipesRequest()
+    {
+        global $db_conn;
+
+        $recipeID = uniqid("recipe_");
         //Getting the values from user and insert data into the table
         $tuple = array(
-            ":bind1" => $_POST['username'],
-            ":bind2" => $_POST['userPassword']
+            ":bind1" => $_POST['newRecipeTitle'],
+            ":bind2" => $_POST['newPreparationTime'],
+            ":bind3" => $_POST['newDifficulty']
         );
 
         $alltuples = array(
             $tuple
         );
 
-        executeBoundSQL("insert into user values (:bind1, :bind2)", $alltuples);
+        $result = executeBoundSQL("INSERT into Recipe values ('$recipeID', :bind1, :bind2, :bind3)", $alltuples);
+
+        if ($result == true) {
+            echo "Success!";
+        } else {
+            echo "Error Adding Recipe";
+        }
+
+        OCICommit($db_conn);
+    }
+
+    function handleDeleteRecipesRequest()
+    {
+        global $db_conn;
+        $title = $_GET['deleteRecipeTitle'];
+        $recipeID = oci_fetch_row(executePlainSQL("SELECT recipeID FROM Recipe WHERE recipeTitle = '$title'"))[0];
+
+        $result = executePlainSQL("DELETE FROM Recipe WHERE recipeID = '$recipeID");
+
+        if ($result == true) {
+            echo "Success!";
+        } else {
+            echo "Error deleting Recipe";
+        }
+
         OCICommit($db_conn);
     }
 
