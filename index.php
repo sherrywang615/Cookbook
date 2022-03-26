@@ -6,17 +6,6 @@
 
 <body>
     <h1>CPSC 304 Project Group 28 </h1>
-    <h2>Reset</h2>
-    <p>If you wish to reset the table press on the reset button. If this is the first time you're running this page, you MUST use reset</p>
-
-    <form method="POST" action="oracle-test.php">
-        <!-- if you want another page to load after the button is clicked, you have to specify that page in the action parameter -->
-        <input type="hidden" id="resetTablesRequest" name="resetTablesRequest">
-        <p><input type="submit" value="Reset" name="reset"></p>
-    </form>
-
-    <hr />
-
     <h2>New User? Create Account Here!</h2>
     <form method="POST" action="index.php">
         <!--refresh page when submitted-->
@@ -49,7 +38,7 @@
     <form method="POST" action="index.php">
         <!--refresh page when submitted-->
         <input type="hidden" id="addRecipeRequest" name="addRecipeRequest">
-        Recipe Title: <input type="text" name="newRecipeTitle"> <br /><br />
+        Recipe Name: <input type="text" name="newRecipeName"> <br /><br />
         Preparation Time &#40In minutes&#41: <input type="text" name="newPreparationTime">&nbsp mins <br /><br />
         Difficulty &#40Rate on a scale of 1-10&#41: <input type="text" name="newDifficulty"> <br /><br />
 
@@ -58,13 +47,14 @@
 
     <hr />
 
-    <h2>Delete Recipes</h2>
+
+    <h2>Delete Ingredient</h2>
     <form method="GET" action="index.php">
         <!--refresh page when submitted-->
-        <input type="hidden" id="deleteRecipeRequest" name="deleteRecipeRequest">
-        Recipe Title: <input type="text" name="deleteRecipeTitle"> <br /><br />
+        <input type="hidden" id="deleteIngredientRequest" name="deleteIngredientRequest">
+        Ingredient ID: <input type="text" name="deleteIngredientID"> <br /><br />
 
-        <input type="submit" value="Delete Recipe" name="deleteRecipeSubmit"></p>
+        <input type="submit" value="Delete Ingredient" name="deleteIngredientSubmit"></p>
     </form>
 
     <hr />
@@ -86,7 +76,7 @@
         <input type="hidden" id="viewDetailsRequest" name="viewDetailsRequest
         <label for=" recipeDetails"> Select Recipe Details:</label>
         <select name="recipeDetails" id="recipeDetails">
-            <option value="Title">Title</option>
+            <option value="Name">Name</option>
             <option value="PrepTime">Preparation Time</option>
             <option value="Difficulty">Difficulty</option>
         </select><br /><br />
@@ -100,7 +90,7 @@
     <form method="GET" action="index.php">
         <!--refresh page when submitted-->
         <input type="hidden" id="listIngredientsRequest" name="listIngredientsRequest">
-        Recipe Title: <input type="text" name="recipeTitle"><br /><br />
+        Recipe Name: <input type="text" name="listIngredientsRecipeName"><br /><br />
 
         <input type="submit" value="List Ingredients" name="listIngredientsSubmit"></p>
     </form>
@@ -233,19 +223,6 @@
         }
     }
 
-    function printPreparationTimeResult($result)
-    { //prints results from a select statement
-        echo "<br>Retrieved data from Recipe table:<br>";
-        echo "<table>";
-        echo "<tr><th>Recipe ID</th><th>Title</th><th>Preparation Time</th><th>Difficulty</th></tr>";
-
-        while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-            echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td><td>" . $row[2] . "</td><td>" . $row[3] . "</td></tr>"; //or just use "echo $row[0]"
-        }
-
-        echo "</table>";
-    }
-
     function connectToDB()
     {
         global $db_conn;
@@ -294,18 +271,6 @@
         OCICommit($db_conn);
     }
 
-    function handleResetRequest()
-    {
-        global $db_conn;
-        // Drop old table
-        executePlainSQL("DROP TABLE demoTable");
-
-        // Create new table
-        echo "<br> creating new table <br>";
-        executePlainSQL("CREATE TABLE demoTable (id int PRIMARY KEY, name char(30))");
-        OCICommit($db_conn);
-    }
-
     function handleCreateAccountRequest()
     {
         global $db_conn;
@@ -346,7 +311,7 @@
         $recipeID = uniqid("recipe_");
         //Getting the values from user and insert data into the table
         $tuple = array(
-            ":bind1" => $_POST['newRecipeTitle'],
+            ":bind1" => $_POST['newRecipeName'],
             ":bind2" => $_POST['newPreparationTime'],
             ":bind3" => $_POST['newDifficulty']
         );
@@ -366,22 +331,75 @@
         OCICommit($db_conn);
     }
 
-    function handleDeleteRecipesRequest()
+    // function handleAddIngredientsRequest()
+    // {
+    //     global $db_conn;
+    //     $ingredientID = uniqid("ingre_");
+    //     //Getting the values from user and insert data into the table
+    //     $tuple = array(
+    //         ":bind1" => $_POST['newIngredientName'],
+    //         ":bind2" => $_POST['newAmount'],
+    //         ":bind3" => $_POST['newUnit'],
+    //     );
+
+    //     $alltuples = array(
+    //         $tuple
+    //     );
+
+    //     executeBoundSQL("INSERT into Ingredient values ('$ingredientID', :bind1, :bind2, :bind3)", $alltuples);
+    //     OCICommit($db_conn);
+    // }
+
+    function handleDeleteIngredientRequest()
     {
         global $db_conn;
-        $title = $_GET['deleteRecipeTitle'];
-        $recipeID = oci_fetch_row(executePlainSQL("SELECT recipeID FROM Recipe WHERE recipeTitle = '$title'"))[0];
-
-        $result = executePlainSQL("DELETE FROM Recipe WHERE recipeID = '$recipeID");
-
-        if ($result == true) {
-            echo "Success!";
+        $ingredientID = $_POST['deleteIngredientID'];
+        $result_1 = executePlainSQL("SELECT Count(*) FROM Ingredient WHERE ingredientID = '$ingredientID'");
+        if (($row = oci_fetch_row($result_1)) != false) {
+            executePlainSQL("DELETE FROM Ingredient WHERE ingredientID = '$ingredientID");
+            echo "Ingredient " . $ingredientID . "deleted";
         } else {
-            echo "Error deleting Recipe";
+            echo "Ingredient ID does not exist";
         }
-
         OCICommit($db_conn);
     }
+
+    function handleFilterRecipeRequest() {
+        global $db_conn;
+
+        $prepTime = $_GET['preparationTimeUnder'];
+        $result = executePlainSQL("SELECT recipeID, recipeName, preparationTime, difficulty FROM Recipe_1 R1, Recipe_2 R2, Recipe_3 R3
+        WHERE R1.recipeName = R2.recipeName AND R2.preparationTime = R3.preparationTime AND R2.preparationTime < '$prepTime'");
+
+        echo "Selection Query";
+        echo "<table>";
+        echo "<tr><th>Recipe ID</th><th>Recipe Name</th><th>Preparation Time</th><th>Difficulty</th></tr>";
+
+        while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+            echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td><td>" . $row[2] . "</td><td>" . $row[3] . "</td></tr>"; //or just use "echo $row[0]"
+        }
+
+        echo "</table>";
+    }
+
+    function handleListIngredientsRequest() {
+        global $db_conn;
+
+        $recipeName = $_GET['listIngredientsRecipeName'];
+        $result = executePlainSQL("SELECT ingredientID, ingredientName, amount, unit FROM Recipe, Requires_1, Ingredient
+        WHERE Recipe.recipeID = Requires_1.recipeID AND Requires_1.ingredientID = Ingredient.ingredientID AND Recipe.recipeName = $recipeName");
+
+        echo "Join Query";
+        echo "<table>";
+        echo "<tr><th>Ingredient ID</th><th>Ingredient Name</th><th>Amount</th><th>Unit</th></tr>";
+
+        while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+            echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td><td>" . $row[2] . "</td><td>" . $row[3] . "</td></tr>"; //or just use "echo $row[0]"
+        }
+
+        echo "</table>";
+    }
+
 
     function handleCountRequest()
     {
@@ -399,12 +417,12 @@
     function handlePOSTRequest()
     {
         if (connectToDB()) {
-            if (array_key_exists('resetTablesRequest', $_POST)) {
-                handleResetRequest();
-            } else if (array_key_exists('updateQueryRequest', $_POST)) {
-                handleUpdateRequest();
-            } else if (array_key_exists('insertQueryRequest', $_POST)) {
-                handleInsertRequest();
+            if (array_key_exists('updateAccountRequest', $_POST)) {
+                handleUpdateAccountRequest();
+            } else if (array_key_exists('createAccountRequest', $_POST)) {
+                handleCreateAccountRequest();
+            } else if (array_key_exists('addRecipeRequest', $_POST)) {
+                handleAddRecipesRequest();
             }
 
             disconnectFromDB();
@@ -416,17 +434,19 @@
     function handleGETRequest()
     {
         if (connectToDB()) {
-            if (array_key_exists('countTuples', $_GET)) {
-                handleCountRequest();
+            if (array_key_exists('deleteIngredientRequest', $_GET)) {
+                handleDeleteIngredientRequest();
+            } else if (array_key_exists('deleteRecipeRequest', $_GET)) {
+                handleDeleteRecipeRequest();
             }
 
             disconnectFromDB();
         }
     }
 
-    if (isset($_POST['reset']) || isset($_POST['updateSubmit']) || isset($_POST['insertSubmit'])) {
+    if (isset($_POST['createAccountSubmit']) || isset($_POST['updateSubmit']) || isset($_POST['addRecipeSubmit'])) {
         handlePOSTRequest();
-    } else if (isset($_GET['countTupleRequest'])) {
+    } else if (isset($_GET['deleteRecipeRequest'])) {
         handleGETRequest();
     }
     ?>
