@@ -127,7 +127,7 @@
 
     <hr />
 
-    <h2>(Division)</h2>
+    <h2>Find All Ingredients that Appear in All Recipes (Division)</h2>
     <form method="GET" action="index.php">
         <!--refresh page when submitted-->
         <input type="hidden" id="countIngredientsRequest" name="countIngredientsRequest">
@@ -259,14 +259,14 @@
         $old_password = $_POST['oldPassword'];
         $new_password = $_POST['newPassword'];
 
-        // you need the wrap the old name and new name values with single quotations
-        $result = executePlainSQL("UPDATE User SET username='$new_username', userPassword='$new_password' WHERE username='$old_username' AND userPassword='$old_password");
-
-        if ($result == true) {
-            echo "Success!";
+        $result_1 = executePlainSQL("SELECT Count(*) FROM User WHERE username = '$old_username' AND password = '$old_password'");
+        if (oci_fetch_row($result_1) != false) {
+            executePlainSQL("UPDATE User SET username='$new_username', userPassword='$new_password' WHERE username='$old_username' AND userPassword='$old_password");
         } else {
-            echo "Error Updating Account";
+            echo "Old username or old password does not exist";
         }
+               
+        printUsers();
 
         OCICommit($db_conn);
     }
@@ -277,8 +277,8 @@
 
         //Check if the username already exists
         $nameEntered = $_POST['username'];
-        $result = executePlainSQL("SELECT Count(*) FROM User WHERE username = $nameEntered");
-        if (oci_fetch_row($result) != false) {
+        $result_1 = executePlainSQL("SELECT Count(*) FROM User WHERE username = '$nameEntered'");
+        if (oci_fetch_row($result_1) != false) {
             echo "Username already exists";
         } else {
             $tuple = array(
@@ -287,21 +287,31 @@
             );
 
             $userID = uniqid("user_");
-
             $alltuples = array(
                 $tuple
             );
 
-            $result = executeBoundSQL("Insert into User values ('$userID', :bind1, :bind2)", $alltuples);
-
-            if ($result == true) {
-                echo "Success!";
-            } else {
-                echo "Error Creating Account";
+            executeBoundSQL("Insert into User values ('$userID', :bind1, :bind2)", $alltuples);
             }
+            
+            printUsers();
+        OCICommit($db_conn);
+    }
+
+    function printUsers() {
+        global $db_conn;
+
+        $result = executePlainSQL("SELECT * FROM User");
+
+        echo "User Table";
+        echo "<table>";
+        echo "<tr><th>User ID</th><th>Username</th><th>Password</th></tr>";
+
+        while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+            echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td><td>" . $row[2] . "</td></tr>"; //or just use "echo $row[0]"
         }
 
-        OCICommit($db_conn);
+        echo "</table>";
     }
 
     function handleAddRecipesRequest()
@@ -320,15 +330,27 @@
             $tuple
         );
 
-        $result = executeBoundSQL("INSERT into Recipe values ('$recipeID', :bind1, :bind2, :bind3)", $alltuples);
+        executeBoundSQL("INSERT into Recipe values ('$recipeID', :bind1, :bind2, :bind3)", $alltuples);
 
-        if ($result == true) {
-            echo "Success!";
-        } else {
-            echo "Error Adding Recipe";
+        printRecipes();
+        OCICommit($db_conn);
+    }
+
+    function printRecipes() {
+        global $db_conn;
+
+        $result = executePlainSQL("SELECT * FROM Recipe_1, Recipe_2, Recipe_3 WHERE Recipe_1.recipeName = Recipe_2.recipeName 
+        AND Recipe_2.preparationTime = Recipe_3.preparationTime");
+
+        echo "Recipe Table";
+        echo "<table>";
+        echo "<tr><th>Recipe ID</th><th>Recipe Name</th><th>Preparation Time</th><th>Difficulty</th></tr>";
+
+        while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+            echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td><td>" . $row[2] . "</td><td>" . $row[3] . "</td></tr>"; //or just use "echo $row[0]"
         }
 
-        OCICommit($db_conn);
+        echo "</table>";
     }
 
     // function handleAddIngredientsRequest()
@@ -355,12 +377,14 @@
         global $db_conn;
         $ingredientID = $_POST['deleteIngredientID'];
         $result_1 = executePlainSQL("SELECT Count(*) FROM Ingredient WHERE ingredientID = '$ingredientID'");
+
         if (($row = oci_fetch_row($result_1)) != false) {
             executePlainSQL("DELETE FROM Ingredient WHERE ingredientID = '$ingredientID");
-            echo "Ingredient " . $ingredientID . "deleted";
         } else {
             echo "Ingredient ID does not exist";
         }
+
+        printRecipes();
         OCICommit($db_conn);
     }
 
@@ -368,8 +392,8 @@
         global $db_conn;
 
         $prepTime = $_GET['preparationTimeUnder'];
-        $result = executePlainSQL("SELECT recipeID, recipeName, preparationTime, difficulty FROM Recipe_1 R1, Recipe_2 R2, Recipe_3 R3
-        WHERE R1.recipeName = R2.recipeName AND R2.preparationTime = R3.preparationTime AND R2.preparationTime < '$prepTime'");
+        $result = executePlainSQL("SELECT * FROM Recipe_1, Recipe_2, Recipe_3
+        WHERE Recipe_1.recipeName = Recipe_2.recipeName AND Recipe_2.preparationTime = Recipe_3.preparationTime AND Recipe_2.preparationTime < '$prepTime'");
 
         echo "Selection Query";
         echo "<table>";
@@ -398,6 +422,12 @@
         }
 
         echo "</table>";
+    }
+
+    function handleFindMinDifficultyRequest() {
+        global $db_conn;
+
+        $result = executePlainSQL("SELECT ");
     }
 
 
