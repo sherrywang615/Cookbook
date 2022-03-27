@@ -97,16 +97,6 @@
 
     <hr />
 
-    <h2>Find the Recipes with the Highest Difficulty (Aggregation)</h2>
-    <form method="GET" action="index.php">
-        <!--refresh page when submitted-->
-        <input type="hidden" id="findMaxDifficultyRequest" name="findMaxDifficultyRequest">
-
-        <input type="submit" value="Search" name="findMaxDifficultySubmit"></p>
-    </form>
-
-    <hr />
-
     <h2>Find the Recipes with the Lowest Difficulty (Aggregation)</h2>
     <form method="GET" action="index.php">
         <!--refresh page when submitted-->
@@ -409,9 +399,8 @@
     function handleListIngredientsRequest() {
         global $db_conn;
 
-        $recipeName = $_GET['listIngredientsRecipeName'];
-        $result = executePlainSQL("SELECT ingredientID, ingredientName, amount, unit FROM Recipe, Requires_1, Ingredient
-        WHERE Recipe.recipeID = Requires_1.recipeID AND Requires_1.ingredientID = Ingredient.ingredientID AND Recipe.recipeName = $recipeName");
+        $result = executePlainSQL("SELECT I.ingredientID, ingredientName, amount, unit FROM Recipe_1, Requires_1, Ingredient I
+        WHERE Recipe_1.recipeID = Requires_1.recipeID AND Requires_1.ingredientID = Ingredient.ingredientID AND Recipe_1.recipeName = '$recipeName'");
 
         echo "Join Query";
         echo "<table>";
@@ -427,20 +416,66 @@
     function handleFindMinDifficultyRequest() {
         global $db_conn;
 
-        $result = executePlainSQL("SELECT ");
+        $result = executePlainSQL("SELECT R1.recipeID, R1.recipeName, difficulty FROM Recipe_1 R1, Recipe_2 R2, Recipe_3 R3
+        WHERE R1.recipeName = R2.recipeName AND R2.preparationTime = R3.preparationTime AND R3.difficulty = (SELECT MIN(R32.difficulty) FROM Recipe_3 R32)");
+
+        echo "Aggregation Query";
+        echo "<table>";
+        echo "<tr><th>Recipe ID</th><th>Recipe Name</th><th>Difficulty</th></tr>";
+
+        while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+            echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td><td>" . $row[2] . "</td></tr>"; //or just use "echo $row[0]"
+        }
+
+        echo "</table>";
     }
 
-
-    function handleCountRequest()
-    {
+    function handleCountIngredientsRequest() {
         global $db_conn;
 
-        $result = executePlainSQL("SELECT Count(*) FROM demoTable");
+        $result = executePlainSQL("SELECT recipeID, recipeName, COUNT(Ingredient.ingredientID) FROM Requires_1, Ingredient 
+        WHERE Requires_1.ingredientID = Ingredient.ingredientID GROUP BY recipeID");
 
-        if (($row = oci_fetch_row($result)) != false) {
-            echo "<br> The number of tuples in demoTable: " . $row[0] . "<br>";
+        echo "Nested Aggregation Query";
+        echo "<table>";
+        echo "<tr><th>Recipe ID</th><th>Recipe Name</th><th>Number of Ingredients</th></tr>";
+
+        while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+            echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td><td>" . $row[2] . "</td></tr>"; //or just use "echo $row[0]"
         }
+
+        echo "</table>";
     }
+
+    function handleFindIngredientsInAllRecipeRequest() {
+        global $db_conn;
+
+        $result = executePlainSQL("SELECT ingredientID, ingredientName FROM Ingredient WHERE NOT EXISTS 
+        ((SELECT Recipe_1.recipeID FROM Recipe_1) EXCEPT (SELECT Requires_1.recipeID FROM Requires_1 
+        WHERE Requires_1.ingredientID = Ingredient.ingredientID))");
+
+        echo "Division Query";
+        echo "<table>";
+        echo "<tr><th>Ingredient ID</th><th>Ingredient Name</th></tr>";
+
+        while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+            echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td></tr>"; //or just use "echo $row[0]"
+        }
+
+        echo "</table>";
+    }
+
+
+    // function handleCountRequest()
+    // {
+    //     global $db_conn;
+
+    //     $result = executePlainSQL("SELECT Count(*) FROM demoTable");
+
+    //     if (($row = oci_fetch_row($result)) != false) {
+    //         echo "<br> The number of tuples in demoTable: " . $row[0] . "<br>";
+    //     }
+    // }
 
     // HANDLE ALL POST ROUTES
     // A better coding practice is to have one method that reroutes your requests accordingly. It will make it easier to add/remove functionality.
