@@ -6,7 +6,7 @@
 
 <body>
     <h1>CPSC 304 Project Group 28 </h1>
-    <h2>New User? Create Account Here!</h2>
+    <h2>New User? Create Account Here! (Insert)</h2>
     <form method="POST" action="index.php">
         <!--refresh page when submitted-->
         <input type="hidden" id="createAccountRequest" name="createAccountRequest">
@@ -18,7 +18,7 @@
 
     <hr />
 
-    <h2>Update Account Info</h2>
+    <h2>Update Account Info (Update)</h2>
     <p>The values are case sensitive and if you enter in the wrong case, the update statement will not do anything.</p>
 
     <form method="POST" action="index.php">
@@ -34,22 +34,8 @@
 
     <hr />
 
-    <h2>Add New Recipes</h2>
+    <h2>Delete Ingredient (Delete)</h2>
     <form method="POST" action="index.php">
-        <!--refresh page when submitted-->
-        <input type="hidden" id="addRecipeRequest" name="addRecipeRequest">
-        Recipe Name: <input type="text" name="newRecipeName"> <br /><br />
-        Preparation Time &#40In minutes&#41: <input type="text" name="newPreparationTime">&nbsp mins <br /><br />
-        Difficulty &#40Rate on a scale of 1-10&#41: <input type="text" name="newDifficulty"> <br /><br />
-
-        <input type="submit" value="Add Recipe" name="addRecipeSubmit"></p>
-    </form>
-
-    <hr />
-
-
-    <h2>Delete Ingredient</h2>
-    <form method="GET" action="index.php">
         <!--refresh page when submitted-->
         <input type="hidden" id="deleteIngredientRequest" name="deleteIngredientRequest">
         Ingredient ID: <input type="text" name="deleteIngredientID"> <br /><br />
@@ -59,7 +45,7 @@
 
     <hr />
 
-    <h2>Looking For A Quick Recipe? Filter Recipes By Preparation Time!(select) </h2>
+    <h2>Looking For A Quick Recipe? Filter Recipes By Preparation Time! (Select) </h2>
     <form method="GET" action="index.php">
         <!--refresh page when submitted-->
         <input type="hidden" id="filterRecipePreparationTimeRequest" name="filterRecipePreparationTimeRequest">
@@ -112,7 +98,7 @@
         <!--refresh page when submitted-->
         <input type="hidden" id="countIngredientsRequest" name="countIngredientsRequest">
 
-        <input type="submit" value="View" name="countIngredientsRequest"></p>
+        <input type="submit" value="View" name="countIngredientsSubmit"></p>
     </form>
 
     <hr />
@@ -120,18 +106,9 @@
     <h2>Find All Ingredients that Appear in All Recipes (Division)</h2>
     <form method="GET" action="index.php">
         <!--refresh page when submitted-->
-        <input type="hidden" id="countIngredientsRequest" name="countIngredientsRequest">
+        <input type="hidden" id="findAllIngredientsRequest" name="findAllIngredientsRequest">
 
-        <input type="submit" value="View" name="countIngredientsRequest"></p>
-    </form>
-
-    <hr />
-
-    <h2>Count the Tuples in DemoTable</h2>
-    <form method="GET" action="oracle-test.php">
-        <!--refresh page when submitted-->
-        <input type="hidden" id="countTupleRequest" name="countTupleRequest">
-        <input type="submit" name="countTuples"></p>
+        <input type="submit" value="View" name="findAllIngredientsSubmit"></p>
     </form>
 
 
@@ -255,7 +232,7 @@
         } else {
             echo "Old username or old password does not exist";
         }
-               
+
         printUsers();
 
         OCICommit($db_conn);
@@ -282,13 +259,14 @@
             );
 
             executeBoundSQL("Insert into User values ('$userID', :bind1, :bind2)", $alltuples);
-            }
-            
-            printUsers();
+        }
+
+        printUsers();
         OCICommit($db_conn);
     }
 
-    function printUsers() {
+    function printUsers()
+    {
         global $db_conn;
 
         $result = executePlainSQL("SELECT * FROM User");
@@ -304,29 +282,8 @@
         echo "</table>";
     }
 
-    function handleAddRecipesRequest()
+    function printRecipes()
     {
-        global $db_conn;
-
-        $recipeID = uniqid("recipe_");
-        //Getting the values from user and insert data into the table
-        $tuple = array(
-            ":bind1" => $_POST['newRecipeName'],
-            ":bind2" => $_POST['newPreparationTime'],
-            ":bind3" => $_POST['newDifficulty']
-        );
-
-        $alltuples = array(
-            $tuple
-        );
-
-        executeBoundSQL("INSERT into Recipe values ('$recipeID', :bind1, :bind2, :bind3)", $alltuples);
-
-        printRecipes();
-        OCICommit($db_conn);
-    }
-
-    function printRecipes() {
         global $db_conn;
 
         $result = executePlainSQL("SELECT * FROM Recipe_1, Recipe_2, Recipe_3 WHERE Recipe_1.recipeName = Recipe_2.recipeName 
@@ -342,25 +299,6 @@
 
         echo "</table>";
     }
-
-    // function handleAddIngredientsRequest()
-    // {
-    //     global $db_conn;
-    //     $ingredientID = uniqid("ingre_");
-    //     //Getting the values from user and insert data into the table
-    //     $tuple = array(
-    //         ":bind1" => $_POST['newIngredientName'],
-    //         ":bind2" => $_POST['newAmount'],
-    //         ":bind3" => $_POST['newUnit'],
-    //     );
-
-    //     $alltuples = array(
-    //         $tuple
-    //     );
-
-    //     executeBoundSQL("INSERT into Ingredient values ('$ingredientID', :bind1, :bind2, :bind3)", $alltuples);
-    //     OCICommit($db_conn);
-    // }
 
     function handleDeleteIngredientRequest()
     {
@@ -378,7 +316,8 @@
         OCICommit($db_conn);
     }
 
-    function handleFilterRecipeRequest() {
+    function handleFilterRecipeRequest()
+    {
         global $db_conn;
 
         $prepTime = $_GET['preparationTimeUnder'];
@@ -396,7 +335,8 @@
         echo "</table>";
     }
 
-    function handleListIngredientsRequest() {
+    function handleListIngredientsRequest()
+    {
         global $db_conn;
 
         $result = executePlainSQL("SELECT I.ingredientID, ingredientName, amount, unit FROM Recipe_1, Requires_1, Ingredient I
@@ -413,7 +353,8 @@
         echo "</table>";
     }
 
-    function handleFindMinDifficultyRequest() {
+    function handleFindMinDifficultyRequest()
+    {
         global $db_conn;
 
         $result = executePlainSQL("SELECT R1.recipeID, R1.recipeName, difficulty FROM Recipe_1 R1, Recipe_2 R2, Recipe_3 R3
@@ -430,7 +371,8 @@
         echo "</table>";
     }
 
-    function handleCountIngredientsRequest() {
+    function handleCountIngredientsRequest()
+    {
         global $db_conn;
 
         $result = executePlainSQL("SELECT recipeID, recipeName, COUNT(Ingredient.ingredientID) FROM Requires_1, Ingredient 
@@ -447,7 +389,8 @@
         echo "</table>";
     }
 
-    function handleFindIngredientsInAllRecipeRequest() {
+    function handleFindIngredientsInAllRecipeRequest()
+    {
         global $db_conn;
 
         $result = executePlainSQL("SELECT ingredientID, ingredientName FROM Ingredient WHERE NOT EXISTS 
@@ -482,14 +425,13 @@
     function handlePOSTRequest()
     {
         if (connectToDB()) {
-            if (array_key_exists('updateAccountRequest', $_POST)) {
-                handleUpdateAccountRequest();
-            } else if (array_key_exists('createAccountRequest', $_POST)) {
+            if (array_key_exists('createAccountRequest', $_POST)) {
                 handleCreateAccountRequest();
-            } else if (array_key_exists('addRecipeRequest', $_POST)) {
-                handleAddRecipesRequest();
+            } else if (array_key_exists('updateAccountRequest', $_POST)) {
+                handleUpdateAccountRequest();
+            } else if (array_key_exists('deleteIngredientRequest', $_POST)) {
+                handleDeleteIngredientRequest();
             }
-
             disconnectFromDB();
         }
     }
@@ -499,19 +441,27 @@
     function handleGETRequest()
     {
         if (connectToDB()) {
-            if (array_key_exists('deleteIngredientRequest', $_GET)) {
-                handleDeleteIngredientRequest();
-            } else if (array_key_exists('deleteRecipeRequest', $_GET)) {
-                handleDeleteRecipeRequest();
+            if (array_key_exists('filterRecipePreparationTimeRequest', $_GET)) {
+                handleFilterRecipeRequest();
+            } else if (array_key_exists('listIngredientsRequest', $_GET)) {
+                handleListIngredientsRequest();
+            } else if (array_key_exists('findMinDifficultyRequest', $_GET)) {
+                handleFindMinDifficultyRequest();
+            } else if (array_key_exists('countIngredientsRequest', $_GET)) {
+                handleCountIngredientsRequest();
+            } else if (array_key_exists('findAllIngredientsRequest', $_GET)) {
+                handleFindIngredientsInAllRecipeRequest();
             }
-
             disconnectFromDB();
         }
     }
 
-    if (isset($_POST['createAccountSubmit']) || isset($_POST['updateSubmit']) || isset($_POST['addRecipeSubmit'])) {
+    if (isset($_POST['createAccountSubmit']) || isset($_POST['updateSubmit']) || isset($_POST['deleteIngredientSubmit'])) {
         handlePOSTRequest();
-    } else if (isset($_GET['deleteRecipeRequest'])) {
+    } else if (
+        isset($_GET['filterRecipeSubmit']) || isset($_GET['listIngredientsSubmit']) || isset($_GET['findMinDifficultySubmit'])
+        || isset($_GET['countIngredientsSubmit']) || isset($_GET['findAllIngredientsSubmit'])
+    ) {
         handleGETRequest();
     }
     ?>
