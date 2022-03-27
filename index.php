@@ -2,6 +2,7 @@
 
 <head>
     <title>CPSC 304 Group 28</title>
+    <link href="/style.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -16,7 +17,6 @@
         <input type="submit" value="Create account" name="createAccountSubmit"></p>
     </form>
 
-    <hr />
 
     <h2>Update Account Info (Update)</h2>
     <p>The values are case sensitive and if you enter in the wrong case, the update statement will not do anything.</p>
@@ -43,7 +43,6 @@
         <input type="submit" value="Delete Ingredient" name="deleteIngredientSubmit"></p>
     </form>
 
-    <hr />
 
     <h2>Looking For A Quick Recipe? Filter Recipes By Preparation Time! (Select) </h2>
     <form method="GET" action="index.php">
@@ -54,7 +53,6 @@
         <input type="submit" value="Search Recipe" name="filterRecipeSubmit"></p>
     </form>
 
-    <hr />
 
     <h2>View Titles, Preparation Time, or Difficulty for All Recipes (Projection)</h2>
     <form method="GET" action="index.php">
@@ -70,7 +68,6 @@
         <input type="submit" value="View" name="viewDetailsSubmit"></p>
     </form>
 
-    <hr />
 
     <h2>List All Ingredients Needed For Your Recipe (join recipeID_Name, requires, ingredient)</h2>
     <form method="GET" action="index.php">
@@ -81,7 +78,6 @@
         <input type="submit" value="List Ingredients" name="listIngredientsSubmit"></p>
     </form>
 
-    <hr />
 
     <h2>Find the Recipes with the Lowest Difficulty (Aggregation)</h2>
     <form method="GET" action="index.php">
@@ -91,7 +87,6 @@
         <input type="submit" value="Search" name="findMinDifficultySubmit"></p>
     </form>
 
-    <hr />
 
     <h2>Count the Number of Ingredients Used For Each Recipe (Nested aggregation)</h2>
     <form method="GET" action="index.php">
@@ -101,7 +96,6 @@
         <input type="submit" value="View" name="countIngredientsSubmit"></p>
     </form>
 
-    <hr />
 
     <h2>Find All Ingredients that Appear in All Recipes (Division)</h2>
     <form method="GET" action="index.php">
@@ -466,5 +460,4 @@
     }
     ?>
 </body>
-
 </html>
