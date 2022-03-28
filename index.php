@@ -44,13 +44,13 @@
     </form>
 
 
-    <h2>Looking For A Quick Recipe? Filter Recipes By Preparation Time! (Select) </h2>
+    <h2>Filter Recipes By Preparation Time (Select) </h2>
     <form method="GET" action="index.php">
         <!--refresh page when submitted-->
         <input type="hidden" id="filterRecipePreparationTimeRequest" name="filterRecipePreparationTimeRequest">
         Preparation Time Under: <input type="text" name="preparationTimeUnder">&nbsp mins<br /><br />
 
-        <input type="submit" value="Search Recipe" name="filterRecipeSubmit"></p>
+        <input type="submit" value="Filter Recipe" name="filterRecipeSubmit"></p>
     </form>
 
 
@@ -314,9 +314,43 @@
         echo "</table>";
     }
 
+    function printIngredients()
+    {
+        global $db_conn;
+
+        $result = executePlainSQL("SELECT * FROM Ingredient");
+
+        echo "Ingredient Table";
+        echo "<table>";
+        echo "<tr><th>Ingredient ID</th><th>Ingredient Name</th><th>Amount</th><th>Unit</th></tr>";
+
+        while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+            echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td><td>" . $row[2] . "</td><td>" . $row[3] . "</td></tr>"; //or just use "echo $row[0]"
+        }
+
+        echo "</table>";
+    }
+
+    function printRequires_1() {
+        global $db_conn;
+
+        $result = executePlainSQL("SELECT * FROM Requires_1");
+
+        echo "Requires_1 Table";
+        echo "<table>";
+        echo "<tr><th>Recipe ID</th><th>Ingredient ID</th></tr>";
+
+        while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+            echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td></tr>"; //or just use "echo $row[0]"
+        }
+
+        echo "</table>";
+    }
+
     function handleDeleteIngredientRequest()
     {
         global $db_conn;
+
         $ingredientID = $_POST['deleteIngredientID'];
         $result_1 = executePlainSQL("SELECT Count(*) FROM Ingredient WHERE ingredientID = '$ingredientID'");
 
@@ -326,7 +360,8 @@
             echo "Ingredient ID does not exist";
         }
 
-        printRecipes();
+        printIngredients();
+        printRequires_1();
         OCICommit($db_conn);
     }
 
