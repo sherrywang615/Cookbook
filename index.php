@@ -54,18 +54,19 @@
     </form>
 
 
-    <h2>View Titles, Preparation Time, or Difficulty for All Recipes (Projection)</h2>
+    <h2>View Recipe ID, Recipe Name, Preparation Time, or Difficulty for All Recipes (Projection)</h2>
     <form method="GET" action="index.php">
         <!--refresh page when submitted-->
-        <input type="hidden" id="viewDetailsRequest" name="viewDetailsRequest
-        <label for=" recipeDetails"> Select Recipe Details:</label>
-        <select name="recipeDetails" id="recipeDetails">
-            <option value="Name">Name</option>
-            <option value="PrepTime">Preparation Time</option>
-            <option value="Difficulty">Difficulty</option>
+        <input type="hidden" id="viewAttributesRequest" name="viewAttributesRequest">
+        <label for=" recipeAttribute"> Select Recipe Attribute:</label>
+        <select name="recipeAttribute" id="recipeAttribute">
+            <option value="selectID">Recipe ID</option>
+            <option value="selectName">Recipe Name</option>
+            <option value="selectPrepTime">Preparation Time</option>
+            <option value="selectDifficulty">Difficulty</option>
         </select><br /><br />
 
-        <input type="submit" value="View" name="viewDetailsSubmit"></p>
+        <input type="submit" value="View" name="viewAttributesSubmit"></p>
     </form>
 
 
@@ -220,9 +221,9 @@
         $old_password = $_POST['oldPassword'];
         $new_password = $_POST['newPassword'];
 
-        $result_1 = executePlainSQL("SELECT Count(*) FROM User WHERE username = '$old_username' AND password = '$old_password'");
+        $result_1 = executePlainSQL("SELECT Count(*) FROM Users WHERE username = '$old_username' AND password = '$old_password'");
         if (oci_fetch_row($result_1) != false) {
-            executePlainSQL("UPDATE User SET username='$new_username', userPassword='$new_password' WHERE username='$old_username' AND userPassword='$old_password");
+            executePlainSQL("UPDATE Users SET username='$new_username', userPassword='$new_password' WHERE username='$old_username' AND userPassword='$old_password");
         } else {
             echo "Old username or old password does not exist";
         }
@@ -238,7 +239,7 @@
 
         //Check if the username already exists
         $nameEntered = $_POST['username'];
-        $result_1 = executePlainSQL("SELECT Count(*) FROM User WHERE username = '$nameEntered'");
+        $result_1 = executePlainSQL("SELECT Count(*) FROM Users WHERE username = '$nameEntered'");
         if (oci_fetch_row($result_1) != false) {
             echo "Username already exists";
         } else {
@@ -248,11 +249,12 @@
             );
 
             $userID = uniqid("user_");
+            
             $alltuples = array(
                 $tuple
             );
 
-            executeBoundSQL("Insert into User values ('$userID', :bind1, :bind2)", $alltuples);
+            executeBoundSQL("Insert into Users values ('$userID', :bind1, :bind2)", $alltuples);
         }
 
         printUsers();
@@ -263,14 +265,32 @@
     {
         global $db_conn;
 
-        $result = executePlainSQL("SELECT * FROM User");
+        $result = executePlainSQL("SELECT * FROM Users");
 
-        echo "User Table";
+        echo "Users Table";
         echo "<table>";
         echo "<tr><th>User ID</th><th>Username</th><th>Password</th></tr>";
 
         while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
             echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td><td>" . $row[2] . "</td></tr>"; //or just use "echo $row[0]"
+        }
+
+        echo "</table>";
+    }
+
+    function handleViewAttributeRequest() {
+        global $db_conn;
+
+        $attribute = $_GET['recipeAttribute'];
+        $result = executePlainSQL("SELECT $attribute FROM Recipe_1, Recipe_2, Recipe_3 WHERE Recipe_1.recipeName = Recipe_2.recipeName 
+        AND Recipe_2.preparationTime = Recipe_3.preparationTime");
+
+        echo "Attribute Table";
+        echo "<table>";
+        echo "<tr><th>Recipe ID</th></tr>";
+
+        while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+            echo "<tr><td>" . $row[0] . "</td></tr>"; //or just use "echo $row[0]"
         }
 
         echo "</table>";
@@ -445,6 +465,8 @@
                 handleCountIngredientsRequest();
             } else if (array_key_exists('findAllIngredientsRequest', $_GET)) {
                 handleFindIngredientsInAllRecipeRequest();
+            } else if (array_key_exists('viewAttributesRequest', $_GET)) {
+                handleViewAttributeRequest();
             }
             disconnectFromDB();
         }
@@ -454,7 +476,7 @@
         handlePOSTRequest();
     } else if (
         isset($_GET['filterRecipeSubmit']) || isset($_GET['listIngredientsSubmit']) || isset($_GET['findMinDifficultySubmit'])
-        || isset($_GET['countIngredientsSubmit']) || isset($_GET['findAllIngredientsSubmit'])
+        || isset($_GET['countIngredientsSubmit']) || isset($_GET['findAllIngredientsSubmit']) || isset($_GET['viewAttributesSubmit'])
     ) {
         handleGETRequest();
     }

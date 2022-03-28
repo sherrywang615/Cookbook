@@ -1,4 +1,4 @@
-DROP TABLE User;
+DROP TABLE Users;
 DROP TABLE Recipe_1;
 DROP TABLE Recipe_2;
 DROP TABLE Recipe_3;
@@ -6,7 +6,7 @@ DROP TABLE Requires_1;
 DROP TABLE Ingredient;
 DROP TABLE Has_1;
 
-CREATE TABLE User (
+CREATE TABLE Users (
 userID CHAR(30),
 userName CHAR(20),
 password CHAR(20),
@@ -51,74 +51,14 @@ CREATE TABLE Has_1 (
 userID CHAR(30),
 recipeID CHAR(30),
 PRIMARY KEY (userID, recipeID),
-FOREIGN KEY (userID) REFERENCES User,
+FOREIGN KEY (userID) REFERENCES Users,
 FOREIGN KEY (recipeID) REFERENCES Recipe
 ON DELETE CASCADE)
 
 
+INSERT INTO Users VALUES ('user_1', 'xyz', '123456');
+INSERT INTO 
 
 
-
-
-CREATE TABLE Appetizer (
-recipeID INTEGER, 
-shareability CHAR(20)
-PRIMARY KEY (recipeID),
-FOREIGN KEY (recipeID) REFERENCES Recipe)
-
-CREATE TABLE MainCourse (
-recipeID INTEGER, 
-meatType CHAR(20)
-PRIMARY KEY (recipeID),
-FOREIGN KEY (recipeID) REFERENCES Recipe)
-
-CREATE TABLE Dessert (
-recipeID INTEGER, 
-dessertFlavour CHAR(20),
-PRIMARY KEY (recipeID),
-FOREIGN KEY (recipeID) REFERENCES Recipe)
-
-CREATE TABLE Step_Has(
-stepID INTEGER, 
-stepNumber INTEGER, 
-stepDescription CHAR(80),
-recipeID INTEGER,
-PRIMARY KEY (stepID),
-FOREIGN KEY (recipeID) REFERENCES Recipe
-ON DELETE NO ACTION
-ON UPDATE CASCADE)
-
-CREATE TABLE Tool (
-toodID INTEGER,
-toolName CHAR(20)
-PRIMARY KEY (tooID),
-UNIQUE (toolName))
-
-CREATE TABLE Picture_Contains(
-pictureID INTEGER, 
-pictureTitle CHAR(20),
-recipeID INTEGER NOT NULL,
-PRIMARY KEY (pictureID, recipeID),
-FOREIGN KEY (recipeID) REFERENCES Recipe
-ON DELETE CASCADE)
-
-CREATE TABLE Author ( 
-authorID INTEGER,
-authorName CHAR(20),
-PRIMARY KEY (authorID))
-
-CREATE TABLE Has_2 ( 
-userID INTEGER,
-ingredientID INTEGER,
-PRIMARY KEY (userID, ingredientID),
-FOREIGN KEY (userID) REFERENCES User,
-FOREIGN KEY (ingredientID) REFERENCES Ingredient)
-
-CREATE TABLE Requires_2 ( 
-recipeID INTEGER,
-toolID INTEGER,
-PRIMARY KEY (recipeID, toolID),
-FOREIGN KEY (toolID) REFERENCES Tool,
-FOREIGN KEY (recipeID) REFERENCES Recipe)
 
 
