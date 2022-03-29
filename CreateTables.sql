@@ -4,33 +4,39 @@ DROP TABLE Recipe_2;
 DROP TABLE Recipe_3;
 DROP TABLE Requires_1;
 DROP TABLE Ingredient;
-DROP TABLE Has_1;
 
 CREATE TABLE Users (
 userID CHAR(30),
 userName CHAR(20),
-password CHAR(20),
+userPassword CHAR(20),
 PRIMARY KEY(userID),
-UNIQUE (userName))
+UNIQUE (userName));
 
-CREATE TABLE Recipe_1(
-recipeID CHAR(30),
-recipeName CHAR(20),
-PRIMARY KEY (recipeID),
-FOREIGN KEY (recipeName) REFERENCES Recipe_2
-ON DELETE CASCADE)
+CREATE TABLE Recipe_3(
+preparationTime INTEGER,
+difficulty INTEGER,
+PRIMARY KEY(preparationTime));
 
 CREATE TABLE Recipe_2 (
 recipeName CHAR(20),
 preparationTime INTEGER,
 PRIMARY KEY(recipeName),
 FOREIGN KEY (preparationTime) REFERENCES Recipe_3
-ON DELETE CASCADE)
+ON DELETE CASCADE);
 
-CREATE TABLE Recipe_3(
-preparationTime INTEGER,
-difficulty INTEGER,
-PRIMARY KEY(preparationTime))
+CREATE TABLE Recipe_1(
+recipeID CHAR(30),
+recipeName CHAR(20),
+PRIMARY KEY (recipeID),
+FOREIGN KEY (recipeName) REFERENCES Recipe_2
+ON DELETE CASCADE);
+
+CREATE TABLE Ingredient (
+ingredientID CHAR(30), 
+ingredientName CHAR(20), 
+amount INTEGER, 
+unit CHAR(20),
+PRIMARY KEY (ingredientID));
 
 CREATE TABLE Requires_1 ( 
 recipeID INTEGER,
@@ -38,24 +44,8 @@ ingredientID INTEGER,
 PRIMARY KEY (recipeID, ingredientID),
 FOREIGN KEY (ingredientID) REFERENCES Ingredient
 ON DELETE CASCADE,
-FOREIGN KEY (recipeID) REFERENCES Recipe
-ON DELETE CASCADE)
-
-CREATE TABLE Ingredient (
-ingredientID CHAR(30), 
-ingredientName CHAR(20), 
-amount INTEGER, 
-unit CHAR(20),
-PRIMARY KEY (ingredientID))
-
-CREATE TABLE Has_1 (
-userID CHAR(30),
-recipeID CHAR(30),
-PRIMARY KEY (userID, recipeID),
-FOREIGN KEY (userID) REFERENCES Users
-ON DELETE CASCADE,
-FOREIGN KEY (recipeID) REFERENCES Recipe
-ON DELETE CASCADE)
+FOREIGN KEY (recipeID) REFERENCES Recipe_1
+ON DELETE CASCADE);
 
 
 INSERT INTO Users VALUES ('user_1', 'qwe', '123');
@@ -100,7 +90,7 @@ INSERT INTO Requires_1 VALUES ('rec_4', 'ing_5');
 INSERT INTO Requires_1 VALUES ('rec_4', 'ing_2');
 
 INSERT INTO Requires_1 VALUES ('rec_5', 'ing_8');
-INSERT INTO Requires_1 VALUES ('rec_4', 'ing_5');
+INSERT INTO Requires_1 VALUES ('rec_5', 'ing_5');
 
 INSERT INTO Ingredient VALUES ('ing_1', 'Flour', '400', 'g');
 INSERT INTO Ingredient VALUES ('ing_2', 'Banana', '200', 'g');
@@ -111,3 +101,5 @@ INSERT INTO Ingredient VALUES ('ing_6', 'Bacon', '100', 'g');
 INSERT INTO Ingredient VALUES ('ing_7', 'Tomato', '150', 'g');
 INSERT INTO Ingredient VALUES ('ing_8', 'Noodles', '500', 'g');
 INSERT INTO Ingredient VALUES ('ing_9', 'Milk', '200', 'ml');
+
+commit work;
