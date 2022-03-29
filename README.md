@@ -1,4 +1,2 @@
 # CPSC 304 Project
-1. Create Tables and Insert Tuples
-2. UI
-3. php
+Completed (5/9): Insert, Update, Selection, Projection, Aggregation
