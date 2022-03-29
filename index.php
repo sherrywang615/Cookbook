@@ -439,7 +439,7 @@
         global $db_conn;
 
         $result = executePlainSQL("SELECT ingredientID, ingredientName FROM Ingredient WHERE NOT EXISTS 
-        ((SELECT Recipe_1.recipeID FROM Recipe_1) EXCEPT (SELECT Requires_1.recipeID FROM Requires_1 
+        ((SELECT Recipe_1.recipeID FROM Recipe_1) MINUS (SELECT Requires_1.recipeID FROM Requires_1 
         WHERE Requires_1.ingredientID = Ingredient.ingredientID))");
 
         echo "Division Query";
