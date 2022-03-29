@@ -191,7 +191,7 @@
 
         // Your username is ora_(CWL_ID) and the password is a(student number). For example,
         // ora_platypus is the username and a12345678 is the password.
-        $db_conn = OCILogon("ora_xwang90", "a47381579", "dbhost.students.cs.ubc.ca:1522/stu");
+        $db_conn = OCILogon("ora_woojin01", "a51867604", "dbhost.students.cs.ubc.ca:1522/stu");
 
         if ($db_conn) {
             debugAlertMessage("Database is Connected");
@@ -318,7 +318,7 @@
         global $db_conn;
         $ingredientID = $_POST['deleteIngredientID'];
         $result_1 = executePlainSQL("SELECT Count(*) FROM Ingredient WHERE ingredientID = '$ingredientID'");
-
+        
         if (($row = oci_fetch_row($result_1))[0] != 0) {
             executePlainSQL("DELETE FROM Ingredient WHERE ingredientID = '$ingredientID'");
         } else {
@@ -363,7 +363,7 @@
         global $db_conn;
 
         $prepTime = $_GET['preparationTimeUnder'];
-        $result = executePlainSQL("SELECT * FROM Recipe_1, Recipe_2, Recipe_3
+        $result = executePlainSQL("SELECT Recipe_1.recipeID, Recipe_1.recipeName, Recipe_2.preparationTime, Recipe_3.difficulty FROM Recipe_1, Recipe_2, Recipe_3
         WHERE Recipe_1.recipeName = Recipe_2.recipeName AND Recipe_2.preparationTime = Recipe_3.preparationTime AND Recipe_2.preparationTime < '$prepTime'");
 
         echo "Selection Query";
@@ -381,6 +381,7 @@
     {
         global $db_conn;
 
+        $recipeName = $_GET['listIngredientsRecipeName'];
         $result = executePlainSQL("SELECT Ingredient.ingredientID, ingredientName, amount, unit FROM Recipe_1, Requires_1, Ingredient
         WHERE Recipe_1.recipeID = Requires_1.recipeID AND Requires_1.ingredientID = Ingredient.ingredientID AND Recipe_1.recipeName = '$recipeName'");
 
@@ -417,8 +418,10 @@
     {
         global $db_conn;
 
-        $result = executePlainSQL("SELECT Requires_1.recipeID, recipeName, COUNT(Ingredient.ingredientID) FROM Recipe_1, Requires_1, Ingredient 
-        WHERE Recipe_1.recipeID = Requires_1.recipeID AND Requires_1.ingredientID = Ingredient.ingredientID GROUP BY Requires_1.recipeID");
+        $result = executePlainSQL("SELECT Requires_1.recipeID, recipeName, COUNT(*) 
+                                    FROM Recipe_1, Requires_1, Ingredient 
+                                    WHERE Recipe_1.recipeID = Requires_1.recipeID AND Requires_1.ingredientID = Ingredient.ingredientID 
+                                    GROUP BY Requires_1.recipeID, recipeName");
 
         echo "Nested Aggregation Query";
         echo "<table>";
