@@ -44,13 +44,13 @@
     </form>
 
 
-    <h2>Filter Recipes By Preparation Time (Select) </h2>
+    <h2>Looking For A Quick Recipe? Filter Recipes By Preparation Time! (Select) </h2>
     <form method="GET" action="index.php">
         <!--refresh page when submitted-->
         <input type="hidden" id="filterRecipePreparationTimeRequest" name="filterRecipePreparationTimeRequest">
         Preparation Time Under: <input type="text" name="preparationTimeUnder">&nbsp mins<br /><br />
 
-        <input type="submit" value="Filter Recipe" name="filterRecipeSubmit"></p>
+        <input type="submit" value="Search Recipe" name="filterRecipeSubmit"></p>
     </form>
 
 
@@ -60,10 +60,10 @@
         <input type="hidden" id="viewAttributesRequest" name="viewAttributesRequest">
         <label for=" recipeAttribute"> Select Recipe Attribute:</label>
         <select name="recipeAttribute" id="recipeAttribute">
-            <option value="selectID">Recipe ID</option>
-            <option value="selectName">Recipe Name</option>
-            <option value="selectPrepTime">Preparation Time</option>
-            <option value="selectDifficulty">Difficulty</option>
+            <option value="recipeID">Recipe ID</option>
+            <option value="recipeName">Recipe Name</option>
+            <option value="preparationTime">Preparation Time</option>
+            <option value="difficulty">Difficulty</option>
         </select><br /><br />
 
         <input type="submit" value="View" name="viewAttributesSubmit"></p>
@@ -221,15 +221,14 @@
         $old_password = $_POST['oldPassword'];
         $new_password = $_POST['newPassword'];
 
-        $result_1 = executePlainSQL("SELECT Count(*) FROM Users WHERE username = '$old_username' AND password = '$old_password'");
-        if (oci_fetch_row($result_1) != false) {
-            executePlainSQL("UPDATE Users SET username='$new_username', userPassword='$new_password' WHERE username='$old_username' AND userPassword='$old_password");
+        $result_1 = executePlainSQL("SELECT Count(*) FROM Users WHERE username = '$old_username' AND userPassword = '$old_password'");
+        if (oci_fetch_row($result_1)[0] != 0) {
+            executePlainSQL("UPDATE Users SET username='$new_username', userPassword='$new_password' WHERE username='$old_username' AND userPassword='$old_password'");
         } else {
             echo "Old username or old password does not exist";
         }
 
         printUsers();
-
         OCICommit($db_conn);
     }
 
@@ -240,7 +239,7 @@
         //Check if the username already exists
         $nameEntered = $_POST['username'];
         $result_1 = executePlainSQL("SELECT Count(*) FROM Users WHERE username = '$nameEntered'");
-        if (oci_fetch_row($result_1) != false) {
+        if (oci_fetch_row($result_1)[0] != 0) {
             echo "Username already exists";
         } else {
             $tuple = array(
@@ -249,7 +248,6 @@
             );
 
             $userID = uniqid("user_");
-            
             $alltuples = array(
                 $tuple
             );
@@ -267,30 +265,13 @@
 
         $result = executePlainSQL("SELECT * FROM Users");
 
+        echo "<br>";
         echo "Users Table";
         echo "<table>";
         echo "<tr><th>User ID</th><th>Username</th><th>Password</th></tr>";
 
         while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
             echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td><td>" . $row[2] . "</td></tr>"; //or just use "echo $row[0]"
-        }
-
-        echo "</table>";
-    }
-
-    function handleViewAttributeRequest() {
-        global $db_conn;
-
-        $attribute = $_GET['recipeAttribute'];
-        $result = executePlainSQL("SELECT $attribute FROM Recipe_1, Recipe_2, Recipe_3 WHERE Recipe_1.recipeName = Recipe_2.recipeName 
-        AND Recipe_2.preparationTime = Recipe_3.preparationTime");
-
-        echo "Attribute Table";
-        echo "<table>";
-        echo "<tr><th>Recipe ID</th></tr>";
-
-        while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-            echo "<tr><td>" . $row[0] . "</td></tr>"; //or just use "echo $row[0]"
         }
 
         echo "</table>";
@@ -303,6 +284,7 @@
         $result = executePlainSQL("SELECT * FROM Recipe_1, Recipe_2, Recipe_3 WHERE Recipe_1.recipeName = Recipe_2.recipeName 
         AND Recipe_2.preparationTime = Recipe_3.preparationTime");
 
+        echo "<br>";
         echo "Recipe Table";
         echo "<table>";
         echo "<tr><th>Recipe ID</th><th>Recipe Name</th><th>Preparation Time</th><th>Difficulty</th></tr>";
@@ -331,38 +313,38 @@
         echo "</table>";
     }
 
-    function printRequires_1() {
-        global $db_conn;
-
-        $result = executePlainSQL("SELECT * FROM Requires_1");
-
-        echo "Requires_1 Table";
-        echo "<table>";
-        echo "<tr><th>Recipe ID</th><th>Ingredient ID</th></tr>";
-
-        while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-            echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td></tr>"; //or just use "echo $row[0]"
-        }
-
-        echo "</table>";
-    }
-
     function handleDeleteIngredientRequest()
     {
         global $db_conn;
-
         $ingredientID = $_POST['deleteIngredientID'];
         $result_1 = executePlainSQL("SELECT Count(*) FROM Ingredient WHERE ingredientID = '$ingredientID'");
 
-        if (($row = oci_fetch_row($result_1)) != false) {
-            executePlainSQL("DELETE FROM Ingredient WHERE ingredientID = '$ingredientID");
+        if (($row = oci_fetch_row($result_1))[0] != 0) {
+            executePlainSQL("DELETE FROM Ingredient WHERE ingredientID = '$ingredientID'");
         } else {
             echo "Ingredient ID does not exist";
         }
 
         printIngredients();
-        printRequires_1();
         OCICommit($db_conn);
+    }
+
+    function handleViewAttributeRequest() {
+        global $db_conn;
+
+        $attribute = $_GET['recipeAttribute'];
+        $result = executePlainSQL("SELECT $attribute FROM Recipe_1, Recipe_2, Recipe_3 WHERE Recipe_1.recipeName = Recipe_2.recipeName 
+        AND Recipe_2.preparationTime = Recipe_3.preparationTime");
+
+        echo "Attribute Table";
+        echo "<table>";
+        echo "<tr><th>Recipe ID</th></tr>";
+
+        while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+            echo "<tr><td>" . $row[0] . "</td></tr>"; //or just use "echo $row[0]"
+        }
+
+        echo "</table>";
     }
 
     function handleFilterRecipeRequest()
@@ -388,7 +370,7 @@
     {
         global $db_conn;
 
-        $result = executePlainSQL("SELECT I.ingredientID, ingredientName, amount, unit FROM Recipe_1, Requires_1, Ingredient I
+        $result = executePlainSQL("SELECT Ingredient.ingredientID, ingredientName, amount, unit FROM Recipe_1, Requires_1, Ingredient
         WHERE Recipe_1.recipeID = Requires_1.recipeID AND Requires_1.ingredientID = Ingredient.ingredientID AND Recipe_1.recipeName = '$recipeName'");
 
         echo "Join Query";
@@ -424,8 +406,8 @@
     {
         global $db_conn;
 
-        $result = executePlainSQL("SELECT recipeID, recipeName, COUNT(Ingredient.ingredientID) FROM Requires_1, Ingredient 
-        WHERE Requires_1.ingredientID = Ingredient.ingredientID GROUP BY recipeID");
+        $result = executePlainSQL("SELECT Requires_1.recipeID, recipeName, COUNT(Ingredient.ingredientID) FROM Recipe_1, Requires_1, Ingredient 
+        WHERE Recipe_1.recipeID = Requires_1.recipeID AND Requires_1.ingredientID = Ingredient.ingredientID GROUP BY Requires_1.recipeID");
 
         echo "Nested Aggregation Query";
         echo "<table>";
