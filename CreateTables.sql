@@ -39,10 +39,17 @@ unit CHAR(20),
 PRIMARY KEY (ingredientID));
 
 CREATE TABLE Requires_1 ( 
+<<<<<<< HEAD
 recipeID CHAR(30),
 ingredientID CHAR(30),
 PRIMARY KEY (recipeID, ingredientID),
 FOREIGN KEY (ingredientID) REFERENCES Ingredient,
+=======
+recipeID INTEGER,
+ingredientID INTEGER,
+PRIMARY KEY (recipeID, ingredientID),
+FOREIGN KEY (ingredientID) REFERENCES Ingredient
+>>>>>>> cfe29f2cc99cbbb139f20c91203446a96a47f962
 ON DELETE CASCADE,
 FOREIGN KEY (recipeID) REFERENCES Recipe_1
 ON DELETE CASCADE);
@@ -101,3 +108,5 @@ INSERT INTO Ingredient VALUES ('ing_6', 'Bacon', '100', 'g');
 INSERT INTO Ingredient VALUES ('ing_7', 'Tomato', '150', 'g');
 INSERT INTO Ingredient VALUES ('ing_8', 'Noodles', '500', 'g');
 INSERT INTO Ingredient VALUES ('ing_9', 'Milk', '200', 'ml');
+
+commit work;
