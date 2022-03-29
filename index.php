@@ -2,7 +2,7 @@
 
 <head>
     <title>CPSC 304 Group 28</title>
-    <link href="/style.css" rel="stylesheet" />
+    <link href="style.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -44,7 +44,7 @@
     </form>
 
 
-    <h2>Looking For A Quick Recipe? Filter Recipes By Preparation Time! (Select) </h2>
+    <h2>Filter Recipes By Preparation Time! (Selection) </h2>
     <form method="GET" action="index.php">
         <!--refresh page when submitted-->
         <input type="hidden" id="filterRecipePreparationTimeRequest" name="filterRecipePreparationTimeRequest">
@@ -333,8 +333,19 @@
         global $db_conn;
 
         $attribute = $_GET['recipeAttribute'];
-        $result = executePlainSQL("SELECT $attribute FROM Recipe_1, Recipe_2, Recipe_3 WHERE Recipe_1.recipeName = Recipe_2.recipeName 
-        AND Recipe_2.preparationTime = Recipe_3.preparationTime");
+        if($attribute =='recipeID') {
+            $result = executePlainSQL("SELECT recipeID FROM Recipe_1, Recipe_2, Recipe_3 WHERE Recipe_1.recipeName = Recipe_2.recipeName 
+            AND Recipe_2.preparationTime = Recipe_3.preparationTime");
+        } else if($attribute =='recipeName') {
+            $result = executePlainSQL("SELECT Recipe_1.recipeName FROM Recipe_1, Recipe_2, Recipe_3 WHERE Recipe_1.recipeName = Recipe_2.recipeName 
+            AND Recipe_2.preparationTime = Recipe_3.preparationTime");
+        } else if($attribute =='preparationTime') {
+            $result = executePlainSQL("SELECT Recipe_2.preparationTime FROM Recipe_1, Recipe_2, Recipe_3 WHERE Recipe_1.recipeName = Recipe_2.recipeName 
+            AND Recipe_2.preparationTime = Recipe_3.preparationTime");
+        } else if($attribute =='difficulty') {
+            $result = executePlainSQL("SELECT diffculty FROM Recipe_1, Recipe_2, Recipe_3 WHERE Recipe_1.recipeName = Recipe_2.recipeName 
+            AND Recipe_2.preparationTime = Recipe_3.preparationTime");
+        }
 
         echo "Attribute Table";
         echo "<table>";
