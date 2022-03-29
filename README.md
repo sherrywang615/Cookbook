@@ -1,2 +1,2 @@
 # CPSC 304 Project
-Completed: Insert, Update, Selection, Projection, Aggregation
+Completed (5/9): Insert, Update, Selection, Projection, Aggregation
