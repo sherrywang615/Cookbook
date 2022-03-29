@@ -39,19 +39,12 @@ unit CHAR(20),
 PRIMARY KEY (ingredientID));
 
 CREATE TABLE Requires_1 ( 
-<<<<<<< HEAD
 recipeID CHAR(30),
 ingredientID CHAR(30),
 PRIMARY KEY (recipeID, ingredientID),
-FOREIGN KEY (ingredientID) REFERENCES Ingredient,
-=======
-recipeID INTEGER,
-ingredientID INTEGER,
-PRIMARY KEY (recipeID, ingredientID),
-FOREIGN KEY (ingredientID) REFERENCES Ingredient
->>>>>>> cfe29f2cc99cbbb139f20c91203446a96a47f962
-ON DELETE CASCADE,
 FOREIGN KEY (recipeID) REFERENCES Recipe_1
+ON DELETE CASCADE,
+FOREIGN KEY (ingredientID) REFERENCES Ingredient
 ON DELETE CASCADE);
 
 
@@ -79,6 +72,16 @@ INSERT INTO Recipe_1 VALUES ('rec_3', 'Mango Cake');
 INSERT INTO Recipe_1 VALUES ('rec_4', 'Banana Smoothie');
 INSERT INTO Recipe_1 VALUES ('rec_5', 'Noodles');
 
+INSERT INTO Ingredient VALUES ('ing_1', 'Flour', '400', 'g');
+INSERT INTO Ingredient VALUES ('ing_2', 'Banana', '200', 'g');
+INSERT INTO Ingredient VALUES ('ing_3', 'Mango', '80', 'g');
+INSERT INTO Ingredient VALUES ('ing_4', 'Sugar', '50', 'g');
+INSERT INTO Ingredient VALUES ('ing_5', 'Water', '400', 'ml');
+INSERT INTO Ingredient VALUES ('ing_6', 'Bacon', '100', 'g');
+INSERT INTO Ingredient VALUES ('ing_7', 'Tomato', '150', 'g');
+INSERT INTO Ingredient VALUES ('ing_8', 'Noodles', '500', 'g');
+INSERT INTO Ingredient VALUES ('ing_9', 'Milk', '200', 'ml');
+
 INSERT INTO Requires_1 VALUES ('rec_1', 'ing_1');
 INSERT INTO Requires_1 VALUES ('rec_1', 'ing_9');
 INSERT INTO Requires_1 VALUES ('rec_1', 'ing_5');
@@ -98,15 +101,3 @@ INSERT INTO Requires_1 VALUES ('rec_4', 'ing_2');
 
 INSERT INTO Requires_1 VALUES ('rec_5', 'ing_8');
 INSERT INTO Requires_1 VALUES ('rec_5', 'ing_5');
-
-INSERT INTO Ingredient VALUES ('ing_1', 'Flour', '400', 'g');
-INSERT INTO Ingredient VALUES ('ing_2', 'Banana', '200', 'g');
-INSERT INTO Ingredient VALUES ('ing_3', 'Mango', '80', 'g');
-INSERT INTO Ingredient VALUES ('ing_4', 'Sugar', '50', 'g');
-INSERT INTO Ingredient VALUES ('ing_5', 'Water', '400', 'ml');
-INSERT INTO Ingredient VALUES ('ing_6', 'Bacon', '100', 'g');
-INSERT INTO Ingredient VALUES ('ing_7', 'Tomato', '150', 'g');
-INSERT INTO Ingredient VALUES ('ing_8', 'Noodles', '500', 'g');
-INSERT INTO Ingredient VALUES ('ing_9', 'Milk', '200', 'ml');
-
-commit work;
