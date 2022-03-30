@@ -32,7 +32,13 @@
         <input type="submit" value="Update" name="updateSubmit"></p>
     </form>
 
-    <hr />
+    <h2>View All Ingredients </h2>
+    <form method="GET" action="index.php">
+        <!--refresh page when submitted-->
+        <input type="hidden" id="viewIngredientRequest" name="viewIngredientRequest">
+
+        <input type="submit" value="View Ingredients" name="viewIngredientSubmit">
+    </form>
 
     <h2>Delete Ingredient (Delete)</h2>
     <form method="POST" action="index.php">
@@ -43,6 +49,13 @@
         <input type="submit" value="Delete Ingredient" name="deleteIngredientSubmit"></p>
     </form>
 
+    <h2>View All Recipes</h2>
+    <form method="GET" action="index.php">
+        <!--refresh page when submitted-->
+        <input type="hidden" id="viewRecipeRequest" name="viewRecipeRequest">
+
+        <input type="submit" value="View Recipes" name="viewRecipeSubmit">
+    </form>
 
     <h2>Filter Recipes By Preparation Time! (Selection) </h2>
     <form method="GET" action="index.php">
@@ -191,7 +204,7 @@
 
         // Your username is ora_(CWL_ID) and the password is a(student number). For example,
         // ora_platypus is the username and a12345678 is the password.
-        $db_conn = OCILogon("ora_xwang90", "a47381579", "dbhost.students.cs.ubc.ca:1522/stu");
+        $db_conn = OCILogon("ora_woojin01", "a51867604", "dbhost.students.cs.ubc.ca:1522/stu");
 
         if ($db_conn) {
             debugAlertMessage("Database is Connected");
@@ -418,8 +431,10 @@
     {
         global $db_conn;
 
-        $result = executePlainSQL("SELECT Requires_1.recipeID, recipeName, COUNT(Ingredient.ingredientID) FROM Recipe_1, Requires_1, Ingredient 
-        WHERE Recipe_1.recipeID = Requires_1.recipeID AND Requires_1.ingredientID = Ingredient.ingredientID GROUP BY Requires_1.recipeID");
+        $result = executePlainSQL("SELECT Requires_1.recipeID, recipeName, COUNT(*) 
+                                    FROM Recipe_1, Requires_1, Ingredient 
+                                    WHERE Recipe_1.recipeID = Requires_1.recipeID AND Requires_1.ingredientID = Ingredient.ingredientID 
+                                    GROUP BY Requires_1.recipeID, recipeName");
 
         echo "Nested Aggregation Query";
         echo "<table>";
@@ -437,7 +452,7 @@
         global $db_conn;
 
         $result = executePlainSQL("SELECT ingredientID, ingredientName FROM Ingredient WHERE NOT EXISTS 
-        ((SELECT Recipe_1.recipeID FROM Recipe_1) EXCEPT (SELECT Requires_1.recipeID FROM Requires_1 
+        ((SELECT Recipe_1.recipeID FROM Recipe_1) MINUS (SELECT Requires_1.recipeID FROM Requires_1 
         WHERE Requires_1.ingredientID = Ingredient.ingredientID))");
 
         echo "Division Query";
@@ -496,6 +511,10 @@
                 handleFindIngredientsInAllRecipeRequest();
             } else if (array_key_exists('viewAttributesRequest', $_GET)) {
                 handleViewAttributeRequest();
+            } else if (array_key_exists('viewIngredientRequest', $_GET)) {
+                printIngredients();
+            } else if (array_key_exists('viewRecipeRequest', $_GET)) {
+                printRecipes();
             }
             disconnectFromDB();
         }
@@ -506,6 +525,7 @@
     } else if (
         isset($_GET['filterRecipeSubmit']) || isset($_GET['listIngredientsSubmit']) || isset($_GET['findMinDifficultySubmit'])
         || isset($_GET['countIngredientsSubmit']) || isset($_GET['findAllIngredientsSubmit']) || isset($_GET['viewAttributesSubmit'])
+        || isset($_GET['viewIngredientSubmit']) || isset($_GET['viewRecipeSubmit'])
     ) {
         handleGETRequest();
     }
