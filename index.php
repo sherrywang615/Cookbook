@@ -6,7 +6,7 @@
 </head>
 
 <body>
-    <h1>CPSC 304 Project Group 28 </h1>
+    <h1>CPSC 304 Cookbook Project Group 28 </h1>
     <h2>New User? Create Account Here! (Insert)</h2>
     <form method="POST" action="index.php">
         <!--refresh page when submitted-->
@@ -40,6 +40,14 @@
         <input type="submit" value="View Ingredients" name="viewIngredientSubmit">
     </form>
 
+    <h2>View Requires Table </h2>
+    <form method="GET" action="index.php">
+        <!--refresh page when submitted-->
+        <input type="hidden" id="viewRequiresRequest" name="viewRequiresRequest">
+
+        <input type="submit" value="View Requires" name="viewRequiresSubmit">
+    </form>
+
     <h2>Delete Ingredient (Delete)</h2>
     <form method="POST" action="index.php">
         <!--refresh page when submitted-->
@@ -57,7 +65,7 @@
         <input type="submit" value="View Recipes" name="viewRecipeSubmit">
     </form>
 
-    <h2>Filter Recipes By Preparation Time! (Selection) </h2>
+    <h2>Filter Recipes By Preparation Time (Selection) </h2>
     <form method="GET" action="index.php">
         <!--refresh page when submitted-->
         <input type="hidden" id="filterRecipePreparationTimeRequest" name="filterRecipePreparationTimeRequest">
@@ -83,7 +91,7 @@
     </form>
 
 
-    <h2>List All Ingredients Needed For Your Recipe (join recipeID_Name, requires, ingredient)</h2>
+    <h2>List All Ingredients Needed For Your Recipe (Join)</h2>
     <form method="GET" action="index.php">
         <!--refresh page when submitted-->
         <input type="hidden" id="listIngredientsRequest" name="listIngredientsRequest">
@@ -326,6 +334,23 @@
         echo "</table>";
     }
 
+    function printRequires_1()
+    {
+        global $db_conn;
+
+        $result = executePlainSQL("SELECT * FROM Requires_1");
+
+        echo "Requires_1 Table";
+        echo "<table>";
+        echo "<tr><th>Recipe ID</th><th>Ingredient ID</th></tr>";
+
+        while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+            echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td></tr>"; //or just use "echo $row[0]"
+        }
+
+        echo "</table>";
+    }
+
     function handleDeleteIngredientRequest()
     {
         global $db_conn;
@@ -349,20 +374,28 @@
         if($attribute =='recipeID') {
             $result = executePlainSQL("SELECT recipeID FROM Recipe_1, Recipe_2, Recipe_3 WHERE Recipe_1.recipeName = Recipe_2.recipeName 
             AND Recipe_2.preparationTime = Recipe_3.preparationTime");
+            echo "Attribute Table";
+            echo "<table>";
+            echo "<tr><th>Recipe ID</th></tr>";
         } else if($attribute =='recipeName') {
             $result = executePlainSQL("SELECT Recipe_1.recipeName FROM Recipe_1, Recipe_2, Recipe_3 WHERE Recipe_1.recipeName = Recipe_2.recipeName 
             AND Recipe_2.preparationTime = Recipe_3.preparationTime");
+            echo "Attribute Table";
+            echo "<table>";
+            echo "<tr><th>Recipe Name</th></tr>";
         } else if($attribute =='preparationTime') {
             $result = executePlainSQL("SELECT Recipe_2.preparationTime FROM Recipe_1, Recipe_2, Recipe_3 WHERE Recipe_1.recipeName = Recipe_2.recipeName 
             AND Recipe_2.preparationTime = Recipe_3.preparationTime");
+            echo "Attribute Table";
+            echo "<table>";
+            echo "<tr><th>Preparation Time</th></tr>";
         } else if($attribute =='difficulty') {
             $result = executePlainSQL("SELECT diffculty FROM Recipe_1, Recipe_2, Recipe_3 WHERE Recipe_1.recipeName = Recipe_2.recipeName 
             AND Recipe_2.preparationTime = Recipe_3.preparationTime");
+            echo "Attribute Table";
+            echo "<table>";
+            echo "<tr><th>Difficulty</th></tr>";
         }
-
-        echo "Attribute Table";
-        echo "<table>";
-        echo "<tr><th>Recipe ID</th></tr>";
 
         while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
             echo "<tr><td>" . $row[0] . "</td></tr>"; //or just use "echo $row[0]"
@@ -467,17 +500,6 @@
     }
 
 
-    // function handleCountRequest()
-    // {
-    //     global $db_conn;
-
-    //     $result = executePlainSQL("SELECT Count(*) FROM demoTable");
-
-    //     if (($row = oci_fetch_row($result)) != false) {
-    //         echo "<br> The number of tuples in demoTable: " . $row[0] . "<br>";
-    //     }
-    // }
-
     // HANDLE ALL POST ROUTES
     // A better coding practice is to have one method that reroutes your requests accordingly. It will make it easier to add/remove functionality.
     function handlePOSTRequest()
@@ -515,6 +537,8 @@
                 printIngredients();
             } else if (array_key_exists('viewRecipeRequest', $_GET)) {
                 printRecipes();
+            } else if (array_key_exists('viewRequiresRequest', $_GET)) {
+                printRequires_1();
             }
             disconnectFromDB();
         }
@@ -525,7 +549,7 @@
     } else if (
         isset($_GET['filterRecipeSubmit']) || isset($_GET['listIngredientsSubmit']) || isset($_GET['findMinDifficultySubmit'])
         || isset($_GET['countIngredientsSubmit']) || isset($_GET['findAllIngredientsSubmit']) || isset($_GET['viewAttributesSubmit'])
-        || isset($_GET['viewIngredientSubmit']) || isset($_GET['viewRecipeSubmit'])
+        || isset($_GET['viewIngredientSubmit']) || isset($_GET['viewRecipeSubmit']) || isset($_GET['viewRequiresSubmit'])
     ) {
         handleGETRequest();
     }

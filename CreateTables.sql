@@ -47,7 +47,6 @@ ON DELETE CASCADE,
 FOREIGN KEY (ingredientID) REFERENCES Ingredient
 ON DELETE CASCADE);
 
-
 INSERT INTO Users VALUES ('user_1', 'qwe', '123');
 INSERT INTO Users VALUES ('user_2', 'asd', '1234');
 INSERT INTO Users VALUES ('user_3', 'zxc', '12345');
