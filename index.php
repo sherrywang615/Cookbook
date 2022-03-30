@@ -362,7 +362,7 @@
 
         echo "Attribute Table";
         echo "<table>";
-        echo "<tr><th>Recipe ID</th></tr>";
+        echo "<tr><th>$attribute</th></tr>";
 
         while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
             echo "<tr><td>" . $row[0] . "</td></tr>"; //or just use "echo $row[0]"
