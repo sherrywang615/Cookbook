@@ -390,7 +390,7 @@
             echo "<table>";
             echo "<tr><th>Preparation Time</th></tr>";
         } else if($attribute =='difficulty') {
-            $result = executePlainSQL("SELECT diffculty FROM Recipe_1, Recipe_2, Recipe_3 WHERE Recipe_1.recipeName = Recipe_2.recipeName 
+            $result = executePlainSQL("SELECT difficulty FROM Recipe_1, Recipe_2, Recipe_3 WHERE Recipe_1.recipeName = Recipe_2.recipeName 
             AND Recipe_2.preparationTime = Recipe_3.preparationTime");
             echo "Attribute Table";
             echo "<table>";
